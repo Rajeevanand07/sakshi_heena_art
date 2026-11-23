@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "photos": "node scripts/optimize-photos.mjs",
-    "check-layout": "node scripts/check-layout.mjs"
+    "check-layout": "node scripts/check-layout.mjs",
+    "favicon": "node scripts/make-favicon.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
