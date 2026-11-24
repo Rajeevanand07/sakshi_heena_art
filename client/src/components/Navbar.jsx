@@ -1,15 +1,17 @@
 import Logo from './Logo.jsx';
 
+// '/' is the services page (home); the gallery lives at /gallery.
 const LINKS = [
-  { to: '/', label: 'gallery area' },
-  { to: '/services', label: 'services' },
+  { to: '/gallery', label: 'gallery area' },
+  { to: '/', label: 'services' },
 ];
 
 // Fixed on top of the canvas: links on the left, logo on the right.
 // The bar itself lets drags pass through to the canvas underneath; only the
 // links and logo catch clicks.
 // stage: 'loading' hides it, 'intro' fades links then logo in (see App.jsx).
-export default function Navbar({ path, onNavigate, stage = 'done' }) {
+// solid: plain background behind it, for pages that scroll underneath.
+export default function Navbar({ path, onNavigate, stage = 'done', solid = false }) {
   const go = (e, to) => {
     // Let ctrl/cmd-click open a new tab as usual.
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
@@ -21,7 +23,7 @@ export default function Navbar({ path, onNavigate, stage = 'done' }) {
     <header
       className={[
         'nav',
-        path === '/services' && 'nav--solid',
+        solid && 'nav--solid',
         stage === 'loading' && 'nav--wait',
         stage === 'intro' && 'nav--intro',
       ]
