@@ -25,9 +25,16 @@ export default function HScroller({ photos, label = 'Photos' }) {
     let raf = null;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+    // Length of one full set of photos = distance from the first photo of
+    // copy 1 to the first photo of copy 2. Measured from the real positions,
+    // and again at the start of every scroll/drag: if it were measured before
+    // the photos had their size (e.g. during the page-open animation), the
+    // strip would only jiggle in place instead of moving through the photos.
+    const count = photos.length;
     const measure = () => {
-      // The track holds 3 copies of the set; one copy's width is a third.
-      setWidth = Math.max(1, track.scrollWidth / 3);
+      const items = track.children;
+      const w = items.length > count ? items[count].offsetLeft - items[0].offsetLeft : track.scrollWidth / 3;
+      setWidth = Math.max(1, w);
     };
 
     const draw = () => {
@@ -48,7 +55,10 @@ export default function HScroller({ photos, label = 'Photos' }) {
       }
     };
     const kick = () => {
-      if (raf === null) raf = requestAnimationFrame(tick);
+      if (raf === null) {
+        measure(); // once per gesture: cheap, and always up to date
+        raf = requestAnimationFrame(tick);
+      }
     };
 
     const onWheel = (e) => {
@@ -69,6 +79,7 @@ export default function HScroller({ photos, label = 'Photos' }) {
       lastX = e.clientX;
       lastT = performance.now();
       vel = 0;
+      measure();
       view.setPointerCapture?.(e.pointerId);
       view.classList.add('is-dragging');
     };
@@ -105,7 +116,8 @@ export default function HScroller({ photos, label = 'Photos' }) {
       measure();
       draw();
     });
-    ro.observe(track);
+    ro.observe(view); // strip height changes -> photo widths change
+    if (track.firstElementChild) ro.observe(track.firstElementChild);
 
     view.addEventListener('wheel', onWheel, { passive: false });
     view.addEventListener('pointerdown', onDown);
